@@ -28,14 +28,8 @@ public class ClientService {
 	
 	@Transactional(readOnly = true)
 	public List<ClientDTO> findAll(){
-		List<Client> list = repository.findAll(); 	
-		
-		/*List<ClientDTO> listDTO = new ArrayList<>();
-		for(Client cat : list) {
-			listDTO.add(new ClientDTO(cat));
-		}*/
-		return list.stream().map(x -> new ClientDTO(x)).collect(Collectors.toList());
-		
+		List<Client> list = repository.findAll();
+		return list.stream().map(x -> new ClientDTO(x)).collect(Collectors.toList());		
 	}
 
 	@Transactional(readOnly = true)
@@ -48,23 +42,23 @@ public class ClientService {
 	@Transactional
 	public ClientDTO insert(ClientDTO dto) {
 		Client entity = new Client();
-		entity.setName(dto.getName());
+		copyDtoToEntity(dto, entity);		
 		entity = repository.save(entity);
 		return new ClientDTO(entity);
 	}
+
+	
 
 	@Transactional
 	public ClientDTO update(Long id, ClientDTO dto) {
 		try{
 			Client entity = repository.getOne(id);
-			entity.setName(dto.getName());
+			copyDtoToEntity(dto, entity);
 			entity = repository.save(entity);
 			return new ClientDTO(entity);
 		}catch(EntityNotFoundException e ) {
 			throw new ResourceNotFoundException("Id not found" + id);
 		}
-		
-		
 		
 	}
 
@@ -84,6 +78,12 @@ public class ClientService {
 		return list.map(x -> new ClientDTO(x));		 
 	}
 	
-	
+	private void copyDtoToEntity(ClientDTO dto, Client entity) {
+		entity.setName(dto.getName());
+		entity.setIncome(dto.getIncome());
+		entity.setCpf(dto.getCpf());
+		entity.setBirthDate(dto.getBirthDate());
+		entity.setChildren(dto.getChildren());
+	}
 	
 }
